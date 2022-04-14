@@ -13,13 +13,12 @@ All modules saved cached local file after acquiring from API
 
 
 def get_items_data_from_api():
-     '''
-        Acquire items data from api
+    '''
+    Acquire items data from api
     '''
     base = 'https://python.zgulde.net/'
     endpoint = 'api/v1/items'
     items = []
-    
     while True:
         url = base + endpoint
         response = requests.get(url)
@@ -31,11 +30,12 @@ def get_items_data_from_api():
             break
             
     items = pd.DataFrame(items)
+    items.to_csv('items.csv')# Save local file
     return items
 
 def get_stores_data_from_api():
-     '''
-        Acquire stores data from api
+    '''
+    Acquire stores data from api
     '''
     url = 'https://python.zgulde.net/api/v1/stores'
     response = requests.get(url) 
@@ -43,6 +43,7 @@ def get_stores_data_from_api():
 #     max_page = data['payload']['max_page']
     stores= pd.DataFrame(data['payload']['stores'])
     stores = pd.DataFrame(stores)
+    stores.to_csv('stores.csv')# Save local file
     return stores
 
 def get_sales_data_from_api():
@@ -67,24 +68,27 @@ def get_sales_data_from_api():
         data = response.json()
         sales.extend(data['payload']['sales'])
     sales = pd.DataFrame(sales)
+    sales.to_csv('sales.csv')# Save local file
     return sales
 
 def get_combined_item_stores_sales_data():
-     '''
+    '''
         Acquire stores, items, and sales data from api. Combines all three functions into one
     '''
-    sales = get_sales_data_from_api()
-    stores = get_stores_data_from_api()
-    items = get_items_data_from_api()
+    sales = pd.read_csv('sales.csv')
+    stores = pd.read_csv('stores.csv')
+    items = pd.read_csv('items.csv')
 
     sales = sales.rename(columns={'store': 'store_id', 'item': 'item_id'})
     df = pd.merge(sales, stores, how='left', on='store_id')
     df = pd.merge(df, items, how='left', on='item_id')
+    
+    df = df.drop(columns = ['Unnamed: 0_x', 'Unnamed: 0_y', 'Unnamed: 0'])
     return df
 
 
 def get_opsd_data():
-     '''
+    '''
         Acquire Open Power Systems Data for Germany data from api
     '''
     if os.path.exists('opsd.csv'):
