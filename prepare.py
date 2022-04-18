@@ -29,6 +29,11 @@ def prepare_store_data():
     # Set the sale_date to be the datetime variable.
     df = df.set_index('sale_date').sort_index()
     
+#     # Set each date as day, (correct for 'freq = None') and fill NaN columns
+#     # (ffill refers to forward fill. This means when a null is encountered for a particular column, 
+#     #it will be replaced by the value in the previous row)
+#     df = df.asfreq('D', method = 'ffill')
+
     # Add a 'month' and 'day of week' column to your dataframe.
     df['month'] = df.index.month
     df['day'] = df.index.month
